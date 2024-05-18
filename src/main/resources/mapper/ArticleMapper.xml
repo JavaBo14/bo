@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bo.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.bo.model.domain.Article">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="articleTitle" column="articleTitle" jdbcType="VARCHAR"/>
+            <result property="articleContent" column="articleContent" jdbcType="VARCHAR"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,articleTitle,articleContent,
+        createTime,updateTime,isDelete,
+        userId
+    </sql>
+    <!-- 在XML文件中定义一个delete语句 -->
+    <delete id="deleteArticle" parameterType="int">
+        DELETE FROM article
+        WHERE id = #{id}
+    </delete>
+</mapper>
