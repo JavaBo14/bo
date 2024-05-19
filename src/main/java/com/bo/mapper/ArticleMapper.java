@@ -2,7 +2,10 @@ package com.bo.mapper;
 
 import com.bo.model.domain.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.bo.model.domain.User;
 import org.apache.ibatis.annotations.Select;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author Bo
@@ -14,7 +17,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     @Select("select * from article where id = #{id}")
     Article findById(Integer id);
-    Integer deleteArticle(Integer id);
+    Integer deleteArticle(Article article, User user, HttpServletRequest request);
 }
 
 

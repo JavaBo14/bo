@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bo.exception.BusinessException;
 import com.bo.model.domain.Article;
+import com.bo.model.domain.User;
 import com.bo.service.ArticleService;
 import com.bo.mapper.ArticleMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,14 +28,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     private ArticleMapper articleMapper;
 
     @Override
-    public Integer saveArticle(Article article) {
+    public Integer saveArticle(Article article, User user, HttpServletRequest request) {
         int result = article.getId() != null ? articleMapper.updateById(article) : articleMapper.insert(article);
         return result;
     }
 
     @Override
-    public Integer deleteArticle(Integer id) {
-     return articleMapper.deleteArticle(id);
+    public Integer deleteArticle(Article article, User user,HttpServletRequest request) {
+      return articleMapper.deleteArticle(article, user, request);
     }
 
     @Override

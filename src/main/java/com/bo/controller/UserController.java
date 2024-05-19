@@ -12,6 +12,7 @@ import com.bo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,6 +22,7 @@ import static com.bo.constant.UserConstant.ADMIN_ROLE;
 import static com.bo.constant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
     @Resource
     private UserService userService;
@@ -71,7 +73,30 @@ public class UserController {
         int result = userService.userLogout(request);
         return ResultUtil.success(result);
     }
-    private boolean isAdmin(HttpServletRequest request) {
+    @PostMapping("/delete")
+    public BaseResponse<Boolean> userDelete(@RequestBody long id,HttpServletRequest request) {
+        if(!isAdmin(request)){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        if (id<1){
+            return null;
+        }
+        boolean b = userService.removeById(id);
+        return ResultUtil.success(b);
+    }
+    @PostMapping("/save")
+    public BaseResponse<Boolean> userUpdate(@RequestBody User user,HttpServletRequest request) {
+        if(!isAdmin(request)){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        if (user == null) {
+            return null;
+        }
+        boolean b = user.getId() != null ? userService.updateById(user) : userService.save(user);
+        return ResultUtil.success(b);
+    }
+
+    public boolean isAdmin(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
         if (user == null || user.getUserRole() != ADMIN_ROLE) {
