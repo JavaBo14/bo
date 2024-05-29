@@ -11,14 +11,23 @@
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="likeCount" column="likeCount" jdbcType="BIGINT"/>
             <result property="userId" column="userId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,articleTitle,articleContent,
-        createTime,updateTime,isDelete,
+        createTime,updateTime,isDelete,likeCount,
         userId
     </sql>
+
+    <select id="selectPost" resultMap="BaseResultMap">
+        SELECT * FROM article WHERE id = #{id}
+    </select>
+
+    <update id="incrementLikeCount">
+        UPDATE article SET likeCount = likeCount + 1 WHERE id = #{id}
+    </update>
     <!-- 在XML文件中定义一个delete语句 -->
     <delete id="deleteArticle" parameterType="int">
         DELETE FROM article

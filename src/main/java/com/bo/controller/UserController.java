@@ -1,32 +1,38 @@
 package com.bo.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bo.common.BaseResponse;
 import com.bo.common.ErrorCode;
 import com.bo.common.ResultUtil;
 import com.bo.exception.BusinessException;
+import com.bo.mapper.UserMapper;
 import com.bo.model.domain.User;
 import com.bo.model.request.UserLoginRequest;
 import com.bo.model.request.UserRegisterRequest;
 import com.bo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.ibatis.annotations.Delete;
+import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 import static com.bo.constant.UserConstant.ADMIN_ROLE;
 import static com.bo.constant.UserConstant.USER_LOGIN_STATE;
+import static com.sun.javafx.font.FontResource.SALT;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Resource
+    private UserMapper userMapper;
+    @Resource
     private UserService userService;
-
+    private static final String SALT = "wjb";
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
@@ -73,8 +79,21 @@ public class UserController {
         int result = userService.userLogout(request);
         return ResultUtil.success(result);
     }
-    @PostMapping("/delete")
-    public BaseResponse<Boolean> userDelete(@RequestBody long id,HttpServletRequest request) {
+    @GetMapping("findById/{id}")
+    public BaseResponse<User> findByid(@PathVariable Integer id){
+        if(id == null || id<1){
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",id);
+        User users = userMapper.selectOne(queryWrapper);
+        if(users == null){
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return ResultUtil.success(users);
+    }
+    @DeleteMapping("/delete/{id}")
+    public BaseResponse<Boolean> userDelete(@PathVariable long id,HttpServletRequest request) {
         if(!isAdmin(request)){
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
@@ -84,6 +103,7 @@ public class UserController {
         boolean b = userService.removeById(id);
         return ResultUtil.success(b);
     }
+    //待优化
     @PostMapping("/save")
     public BaseResponse<Boolean> userUpdate(@RequestBody User user,HttpServletRequest request) {
         if(!isAdmin(request)){
@@ -92,9 +112,34 @@ public class UserController {
         if (user == null) {
             return null;
         }
-        boolean b = user.getId() != null ? userService.updateById(user) : userService.save(user);
-        return ResultUtil.success(b);
+        Long userId = user.getId();
+        if(userId == null){
+            // 账户不能重复
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            //从数据库里找是否有一样的用户名
+            queryWrapper.eq("userAccount", user.getUserAccount());
+            long count = userMapper.selectCount(queryWrapper);
+            if (count > 0) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+            }
+            // 2.加密
+            String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
+            // 3.插入数据
+            User newUser = new User();
+            newUser.setUserName(user.getUserName());
+            newUser.setUserAccount(user.getUserAccount());
+            newUser.setUserPassword(encryptPassword);
+            boolean saveResult = userService.save(newUser);
+            if (!saveResult) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            }
+            return ResultUtil.success(true);
+        }else {
+            boolean updateResult = userService.updateById(user);
+            return ResultUtil.success(updateResult);
+        }
     }
+//        boolean b = user.getId() != null ? userService.updateById(user) : userService.save(user);
 
     public boolean isAdmin(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
