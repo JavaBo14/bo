@@ -35,4 +35,5 @@ create table thumbs
 
 )
     comment '点赞表' charset = utf8mb4;
+insert into bo_vlog.`article` (`id`, `articleTitle`, `articleContent`, `likeCount`) values (1, 'OZkFZ', 'ZAO', 0);
 

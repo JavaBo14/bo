@@ -53,6 +53,4 @@ public class ResultUtil {
     public static BaseResponse error(ErrorCode errorCode, String description) {
         return new BaseResponse(errorCode.getCode(), errorCode.getMessage(), description);
     }
-
-
 }

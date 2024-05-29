@@ -9,6 +9,7 @@ import com.bo.model.domain.User;
 import com.bo.service.ArticleService;
 import com.bo.mapper.ArticleMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,16 +28,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     @Resource
     private ArticleMapper articleMapper;
 
-    @Override
-    public Integer saveArticle(Article article, User user, HttpServletRequest request) {
-        int result = article.getId() != null ? articleMapper.updateById(article) : articleMapper.insert(article);
-        return result;
-    }
+//    @Override
+//    public Integer saveArticle(Article article, HttpServletRequest request) {
+//        int result = article.getId() != null ? articleMapper.updateById(article) : articleMapper.insert(article);
+//        return result;
+//    }
 
-    @Override
-    public Integer deleteArticle(Article article, User user,HttpServletRequest request) {
-      return articleMapper.deleteArticle(article, user, request);
-    }
+//    @Override
+//    public Integer deleteArticle(Article article, User user,HttpServletRequest request) {
+//      return articleMapper.deleteArticle(article, user, request);
+//    }
 
     @Override
     public Article findArticle(Integer id) {
@@ -52,6 +53,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
             return articleMapper.selectList(null);
         }
     }
+    @Transactional
+    public Article likePost(Long postId) {
+        articleMapper.incrementLikeCount(postId);
+        return articleMapper.selectPost(postId);
+    }
+
 }
 
 

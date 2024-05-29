@@ -45,7 +45,10 @@ public class Article implements Serializable {
      * 是否删除
      */
     private Integer isDelete;
-
+    /**
+     * 点赞数量
+     */
+    private Long likeCount;
     /**
      * 
      */
