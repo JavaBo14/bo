@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/article")
@@ -65,9 +66,9 @@ public class ArticleController {
     }
 
     @GetMapping("/findAll")
-    public BaseResponse<Object> findAll(Integer pageno,Integer size) {
-        Object object = articleService.findAll(pageno, size);
-        return ResultUtil.success(object);
+    public BaseResponse<List<Article>> findAll(Integer pageno, Integer size) {
+        List<Article> listArticle = articleService.findAll(pageno, size);
+        return ResultUtil.success(listArticle);
     }
     @DeleteMapping("/delete/{id}")
     public BaseResponse<Integer> deleteArticle(@PathVariable Integer id,HttpServletRequest request) {
@@ -89,10 +90,10 @@ public class ArticleController {
      * 点赞文章
      */
     @PostMapping("/like/{postId}")
-    public BaseResponse<Long> likePost(@PathVariable Long postId) {
-        Article likedPost = articleService.likePost(postId);
-        Long likeCount = likedPost.getLikeCount();
-        return ResultUtil.success(likeCount);
+    public BaseResponse<Integer> likePost(@PathVariable Long postId) {
+          Integer likedCount= articleService.likePost(postId);
+//        Long likeCount = article.getLikeCount();
+        return ResultUtil.success(likedCount);
     }
 
 }

@@ -3,18 +3,13 @@ package com.bo.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bo.exception.BusinessException;
 import com.bo.model.domain.Article;
-import com.bo.model.domain.User;
 import com.bo.service.ArticleService;
 import com.bo.mapper.ArticleMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,17 +39,31 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
          return articleMapper.findById(id);
     }
 
+//    @Override
+//    public List<Article> findAll(Integer pageno, Integer size) {
+//        if (pageno != null && size != null) {
+//            IPage<Article> page = new Page<>(pageno, size);
+//            return articleMapper.selectPage(page, null);
+//        } else {
+//            return articleMapper.selectList(null);
+//        }
+//    }
     @Override
-    public Object findAll(Integer pageno, Integer size) {
+    public List<Article> findAll(Integer pageno, Integer size) {
         if (pageno != null && size != null) {
+            // 创建分页对象，pageno为页码，size为每页大小
             IPage<Article> page = new Page<>(pageno, size);
-            return articleMapper.selectPage(page, null);
+            // 执行分页查询
+            IPage<Article> resultPage = articleMapper.selectPage(page, null);
+            // 返回分页结果中的记录
+            return resultPage.getRecords();
         } else {
+            // 无分页参数时，返回所有记录
             return articleMapper.selectList(null);
         }
     }
     @Transactional
-    public Article likePost(Long postId) {
+    public Integer likePost(Long postId) {
         articleMapper.incrementLikeCount(postId);
         return articleMapper.selectPost(postId);
     }

@@ -21,8 +21,8 @@
         userId
     </sql>
 
-    <select id="selectPost" resultMap="BaseResultMap">
-        SELECT * FROM article WHERE id = #{id}
+    <select id="selectPost" resultType="int">
+        SELECT likeCount FROM article WHERE id = #{id}
     </select>
 
     <update id="incrementLikeCount">

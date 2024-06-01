@@ -21,7 +21,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
     @Select("select * from article where id = #{id}")
     Article findById(Integer id);
 //    Integer deleteArticle(Article article, User user, HttpServletRequest request);
-    Article selectPost(@Param("id") Long id);
+    int selectPost(@Param("id") Long id);
     int incrementLikeCount(@Param("id") Long id);
 }
 
